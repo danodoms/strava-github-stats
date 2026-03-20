@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ActivityCalendar } from "react-activity-calendar";
 import Link from "next/link";
+import { ActivityCard, type CalendarDatum } from "./ActivityCard";
 
 type StravaActivity = {
   id: number;
@@ -21,12 +21,6 @@ type StravaAthlete = {
   country?: string | null;
   profile?: string | null;
   profile_medium?: string | null;
-};
-
-type CalendarDatum = {
-  date: string;
-  count: number;
-  level: 0 | 1 | 2 | 3 | 4;
 };
 
 function toDateKey(dateLike: string): string {
@@ -51,6 +45,7 @@ export default function AthleteActivitesPage() {
   const [athlete, setAthlete] = useState<StravaAthlete | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const daysToRender: 181 | 363 = 181;
 
   useEffect(() => {
     let cancelled = false;
@@ -124,7 +119,7 @@ export default function AthleteActivitesPage() {
     const maxCount = Math.max(0, ...counts.values());
     const today = new Date();
     const start = new Date(today);
-    start.setDate(today.getDate() - 362);
+    start.setDate(today.getDate() - (daysToRender - 1));
 
     const data: CalendarDatum[] = [];
     const cursor = new Date(start);
@@ -140,7 +135,7 @@ export default function AthleteActivitesPage() {
     }
 
     return data;
-  }, [activities]);
+  }, [activities, daysToRender]);
 
   return (
     <main className="min-h-full bg-[#050810] px-6 py-10 text-white sm:px-10">
@@ -176,72 +171,10 @@ export default function AthleteActivitesPage() {
 
         {!loading && !error && (
           <>
-            <section className="rounded-2xl border-orange-400 border bg-orange-500  p-4">
-              <div className="mb-4 ">
-                {athlete ? (
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-4 border">
-                      {athlete.profile_medium || athlete.profile ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={athlete.profile_medium ?? athlete.profile ?? ""}
-                          alt="Strava profile"
-                          className="size-8 rounded-full border border-white/20 object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/5 text-lg font-bold text-white/70">
-                          {(athlete.firstname?.[0] ?? "A").toUpperCase()}
-                        </div>
-                      )}
-                      <div className="">
-                        <p className="text-base tracking-tighter font-bold text-white">
-                          {`${athlete.firstname ?? ""} ${athlete.lastname ?? ""}`.trim() ||
-                            "Strava Athlete"}
-                        </p>
-                      </div>
-                      <div className=" justify-center bg-white p-4 rounded-md w-min">
-                        <img
-                          src="/icons/api_logo_pwrdBy_strava_horiz_orange.svg"
-                          alt="Powered by Strava"
-                          // className="w-32 h-auto"
-                          style={{ maxWidth: "120px", height: "auto" }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-white/60">No athlete profile found.</p>
-                )}
-              </div>
-
-              {calendarData.length > 0 ? (
-                <ActivityCalendar
-                  blockMargin={4}
-                  blockRadius={2}
-                  data={calendarData}
-                  maxLevel={4}
-                  showWeekdayLabels={true}
-                  showColorLegend={false}
-                  showMonthLabels={true}
-                  showTotalCount={false}
-
-                  theme={{
-                    // dark: ["#1a2238", "#7a2f08", "#b94709", "#e95d0b", "#FC5200"],
-                    dark: [
-                      "#FC5200", // strong Strava orange
-                      "#FD7400", // lighter, more golden orange
-                      "#FE9544", // even lighter orange
-                      "#FFB876", // pale orange, near peach
-                      "#ffffff", // white
-                    ],
-                    light: ["#1a2238", "#7a2f08", "#b94709", "#e95d0b", "#FC5200"],
-                  }}
-                />
-              ) : (
-                <p className="text-sm text-white/60">No activities found.</p>
-              )}
-
-            </section>
+            <ActivityCard
+              athlete={athlete}
+              calendarData={calendarData}
+            />
 
             <section className="rounded-2xl border border-white/10 bg-black/20 p-6">
               <h2 className="mb-3 text-lg font-bold">Raw JSON Preview</h2>

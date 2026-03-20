@@ -176,12 +176,11 @@ export default function AthleteActivitesPage() {
 
         {!loading && !error && (
           <>
-            <section className="rounded-2xl border border-white/10 bg-black/20 p-6">
-              <div className="mb-4 border-white/10">
-                {/* <h2 className="mb-4 text-lg font-bold">Strava Account</h2> */}
+            <section className="rounded-2xl border-orange-400 border bg-orange-500  p-4">
+              <div className="mb-4 ">
                 {athlete ? (
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 border">
                       {athlete.profile_medium || athlete.profile ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -194,11 +193,19 @@ export default function AthleteActivitesPage() {
                           {(athlete.firstname?.[0] ?? "A").toUpperCase()}
                         </div>
                       )}
-                      <div>
+                      <div className="">
                         <p className="text-base tracking-tighter font-bold text-white">
                           {`${athlete.firstname ?? ""} ${athlete.lastname ?? ""}`.trim() ||
                             "Strava Athlete"}
                         </p>
+                      </div>
+                      <div className=" justify-center bg-white p-4 rounded-md w-min">
+                        <img
+                          src="/icons/api_logo_pwrdBy_strava_horiz_orange.svg"
+                          alt="Powered by Strava"
+                          // className="w-32 h-auto"
+                          style={{ maxWidth: "120px", height: "auto" }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -207,7 +214,6 @@ export default function AthleteActivitesPage() {
                 )}
               </div>
 
-              {/* <h2 className="mb-4 text-lg font-bold">Activity Calendar</h2> */}
               {calendarData.length > 0 ? (
                 <ActivityCalendar
                   blockMargin={4}
@@ -218,26 +224,23 @@ export default function AthleteActivitesPage() {
                   showColorLegend={false}
                   showMonthLabels={true}
                   showTotalCount={false}
+
                   theme={{
-                    dark: ["#1a2238", "#7a2f08", "#b94709", "#e95d0b", "#FC5200"],
+                    // dark: ["#1a2238", "#7a2f08", "#b94709", "#e95d0b", "#FC5200"],
+                    dark: [
+                      "#FC5200", // strong Strava orange
+                      "#FD7400", // lighter, more golden orange
+                      "#FE9544", // even lighter orange
+                      "#FFB876", // pale orange, near peach
+                      "#ffffff", // white
+                    ],
                     light: ["#1a2238", "#7a2f08", "#b94709", "#e95d0b", "#FC5200"],
                   }}
-                // labels={{
-                //   totalCount: "{{count}} activities in the last year",
-                // }}
                 />
               ) : (
                 <p className="text-sm text-white/60">No activities found.</p>
               )}
 
-              <div className=" justify-center bg-white p-4 mt-4 rounded-md w-min">
-                <img
-                  src="/icons/api_logo_pwrdBy_strava_horiz_orange.svg"
-                  alt="Powered by Strava"
-                  // className="w-32 h-auto"
-                  style={{ maxWidth: "120px", height: "auto" }}
-                />
-              </div>
             </section>
 
             <section className="rounded-2xl border border-white/10 bg-black/20 p-6">

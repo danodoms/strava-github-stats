@@ -53,12 +53,12 @@ export default async function Home({ searchParams }: HomeProps) {
             </p>
           )}
 
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.35em] text-[#00e5ff]/90">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.35em] text-[#FC5200]">
             Train with your data
           </p>
           <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-tight sm:text-5xl sm:leading-[1.1]">
             Turn your Strava activity into{" "}
-            <span className="bg-linear-to-r from-[#00ffa3] to-[#00d4ff] bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-[#FC5200] to-[#ff8a4d] bg-clip-text text-transparent">
               momentum
             </span>
             .
@@ -71,7 +71,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:gap-5">
             <Link
               href="/api/auth/strava"
-              className="inline-flex h-14 min-w-[200px] items-center justify-center rounded-full bg-linear-to-r from-[#00ffa3] via-[#00e8c8] to-[#00d4ff] px-10 text-base font-bold tracking-wide text-[#041018] shadow-[0_0_40px_-8px_rgba(0,255,163,0.55)] transition hover:brightness-110 hover:shadow-[0_0_48px_-6px_rgba(0,228,255,0.45)] active:scale-[0.98]"
+              className="inline-flex h-14 min-w-[200px] items-center justify-center rounded-full bg-linear-to-r from-[#FC5200] via-[#ff6b1a] to-[#ff8a4d] px-10 text-base font-bold tracking-wide text-white shadow-[0_0_40px_-8px_rgba(252,82,0,0.55)] transition hover:brightness-110 hover:shadow-[0_0_48px_-6px_rgba(252,82,0,0.45)] active:scale-[0.98]"
             >
               Authenticate
             </Link>
@@ -79,6 +79,12 @@ export default async function Home({ searchParams }: HomeProps) {
               Secure Strava OAuth — you approve what we can read.
             </p>
           </div>
+          <Link
+            href="/athlete/activites"
+            className="mt-5 text-sm font-semibold text-[#FC5200] transition hover:text-[#ff8a4d]"
+          >
+            View activity calendar
+          </Link>
         </main>
 
         <footer className="relative z-10 border-t border-white/8 bg-black/20 px-6 py-6 backdrop-blur-sm sm:px-10">

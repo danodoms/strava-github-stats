@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { getStravaAccessToken } from "../_lib/strava-token-store";
 
 const CACHE_TTL_MS = 15 * 60 * 1000;
 
@@ -17,8 +18,8 @@ const athleteCache = new Map<string, CachedEntry>();
  *
  * Returns raw upstream response and caches by default for 15 minutes.
  */
-export async function GET(request: NextRequest) {
-  const accessToken = request.cookies.get("strava_access_token")?.value;
+export async function GET() {
+  let accessToken = await getStravaAccessToken();
   if (!accessToken) {
     return NextResponse.json(
       { error: "missing_strava_access_token" },
@@ -41,6 +42,30 @@ export async function GET(request: NextRequest) {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+  if (stravaRes.status === 401) {
+    accessToken = await getStravaAccessToken({ forceRefresh: true });
+    if (!accessToken) {
+      return NextResponse.json({ error: "strava_reauth_required" }, { status: 401 });
+    }
+    const retryRes = await fetch("https://www.strava.com/api/v3/athlete", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const retryContentType =
+      retryRes.headers.get("content-type") ?? "application/json; charset=utf-8";
+    const retryBody = await retryRes.text();
+    athleteCache.set(accessToken, {
+      status: retryRes.status,
+      contentType: retryContentType,
+      body: retryBody,
+      expiresAt: Date.now() + CACHE_TTL_MS,
+    });
+    return new NextResponse(retryBody, {
+      status: retryRes.status,
+      headers: { "Content-Type": retryContentType },
+    });
+  }
 
   const contentType =
     stravaRes.headers.get("content-type") ?? "application/json; charset=utf-8";

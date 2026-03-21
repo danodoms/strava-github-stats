@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getStravaAccessToken } from "../../_lib/strava-token-store";
 
 const CACHE_TTL_MS = 15 * 60 * 1000;
 
@@ -18,7 +19,7 @@ const activitiesCache = new Map<string, CachedEntry>();
  * Returns raw upstream response and caches by default for 15 minutes.
  */
 export async function GET(request: NextRequest) {
-  const accessToken = request.cookies.get("strava_access_token")?.value;
+  let accessToken = await getStravaAccessToken();
   if (!accessToken) {
     return NextResponse.json(
       { error: "missing_strava_access_token" },
@@ -38,12 +39,24 @@ export async function GET(request: NextRequest) {
   const url = new URL("https://www.strava.com/api/v3/athlete/activities");
   url.search = request.nextUrl.searchParams.toString();
 
-  const stravaRes = await fetch(url.toString(), {
+  let stravaRes = await fetch(url.toString(), {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+  if (stravaRes.status === 401) {
+    accessToken = await getStravaAccessToken({ forceRefresh: true });
+    if (!accessToken) {
+      return NextResponse.json({ error: "strava_reauth_required" }, { status: 401 });
+    }
+    stravaRes = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  }
 
   const contentType =
     stravaRes.headers.get("content-type") ?? "application/json; charset=utf-8";

@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { getStravaAccessToken } from "../../_lib/strava-token-store";
 
 type StravaActivity = {
   start_date: string;
@@ -43,7 +44,7 @@ function getDaysToRender(request: NextRequest): 181 | 363 {
 
 export async function GET(request: NextRequest) {
   const poweredByStravaLogoUrl = `${request.nextUrl.origin}/icons/api_logo_pwrdBy_strava_horiz_orange.svg`;
-  const accessToken = request.cookies.get("strava_access_token")?.value;
+  let accessToken = await getStravaAccessToken();
   if (!accessToken) {
     return new ImageResponse(
       (
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
   activitiesUrl.searchParams.set("per_page", perPage);
   activitiesUrl.searchParams.set("page", page);
 
-  const [activitiesRes, athleteRes] = await Promise.all([
+  let [activitiesRes, athleteRes] = await Promise.all([
     fetch(activitiesUrl.toString(), {
       headers: { Authorization: `Bearer ${accessToken}` },
     }),
@@ -90,6 +91,47 @@ export async function GET(request: NextRequest) {
       headers: { Authorization: `Bearer ${accessToken}` },
     }),
   ]);
+
+  if (activitiesRes.status === 401 || athleteRes.status === 401) {
+    accessToken = await getStravaAccessToken({ forceRefresh: true });
+    if (!accessToken) {
+      return new ImageResponse(
+        (
+          <div
+            style={{
+              width: "1200px",
+              height: "630px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f97316",
+              color: "white",
+              fontFamily: "Inter, Arial, sans-serif",
+              fontSize: "42px",
+              fontWeight: 700,
+            }}
+          >
+            Strava reauthorization required
+          </div>
+        ),
+        {
+          width: 1200,
+          height: 630,
+          headers: {
+            "Cache-Control": "public, max-age=60",
+          },
+        },
+      );
+    }
+    [activitiesRes, athleteRes] = await Promise.all([
+      fetch(activitiesUrl.toString(), {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+      fetch("https://www.strava.com/api/v3/athlete", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+    ]);
+  }
 
   if (!activitiesRes.ok || !athleteRes.ok) {
     return new ImageResponse(

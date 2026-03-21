@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  //build params for strava authorize url
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri(request),

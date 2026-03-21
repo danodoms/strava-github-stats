@@ -43,13 +43,34 @@ function getDaysToRender(request: NextRequest): 181 | 363 {
 
 export async function GET(request: NextRequest) {
   const poweredByStravaLogoUrl = `${request.nextUrl.origin}/icons/api_logo_pwrdBy_strava_horiz_orange.svg`;
-  const accessToken =
-    request.cookies.get("strava_access_token")?.value ??
-    process.env.STRAVA_ACCESS_TOKEN;
+  const accessToken = request.cookies.get("strava_access_token")?.value;
   if (!accessToken) {
-    return NextResponse.json(
-      { error: "missing_strava_access_token" },
-      { status: 500 },
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "1200px",
+            height: "630px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#f97316",
+            color: "white",
+            fontFamily: "Inter, Arial, sans-serif",
+            fontSize: "42px",
+            fontWeight: 700,
+          }}
+        >
+          Missing Strava access token
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 630,
+        headers: {
+          "Cache-Control": "public, max-age=60",
+        },
+      },
     );
   }
 
@@ -71,13 +92,32 @@ export async function GET(request: NextRequest) {
   ]);
 
   if (!activitiesRes.ok || !athleteRes.ok) {
-    return NextResponse.json(
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "1200px",
+            height: "630px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#f97316",
+            color: "white",
+            fontFamily: "Inter, Arial, sans-serif",
+            fontSize: "42px",
+            fontWeight: 700,
+          }}
+        >
+          Failed to fetch Strava data
+        </div>
+      ),
       {
-        error: "failed_to_fetch_strava_data",
-        activities_status: activitiesRes.status,
-        athlete_status: athleteRes.status,
+        width: 1200,
+        height: 630,
+        headers: {
+          "Cache-Control": "public, max-age=60",
+        },
       },
-      { status: 502 },
     );
   }
 
@@ -89,9 +129,32 @@ export async function GET(request: NextRequest) {
     typeof athleteBody !== "object" ||
     !athleteBody
   ) {
-    return NextResponse.json(
-      { error: "unexpected_response_shape" },
-      { status: 500 },
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "1200px",
+            height: "630px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#f97316",
+            color: "white",
+            fontFamily: "Inter, Arial, sans-serif",
+            fontSize: "42px",
+            fontWeight: 700,
+          }}
+        >
+          Unexpected Strava response shape
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 630,
+        headers: {
+          "Cache-Control": "public, max-age=60",
+        },
+      },
     );
   }
 

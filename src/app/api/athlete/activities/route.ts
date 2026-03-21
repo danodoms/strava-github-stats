@@ -15,7 +15,7 @@ const activitiesCache = new Map<string, CachedEntry>();
  * Pass-through to Strava's:
  *   GET /api/v3/athlete/activities
  *
- * This endpoint returns Strava's raw JSON response body.
+ * Returns raw upstream response and caches by default for 15 minutes.
  */
 export async function GET(request: NextRequest) {
   const accessToken = request.cookies.get("strava_access_token")?.value;
@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
     stravaRes.headers.get("content-type") ?? "application/json; charset=utf-8";
   const body = await stravaRes.text();
 
-  // Cache all upstream responses for 15 minutes by default.
   activitiesCache.set(cacheKey, {
     status: stravaRes.status,
     contentType,

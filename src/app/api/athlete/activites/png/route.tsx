@@ -42,6 +42,7 @@ function getDaysToRender(request: NextRequest): 181 | 363 {
 }
 
 export async function GET(request: NextRequest) {
+  const poweredByStravaLogoUrl = `${request.nextUrl.origin}/icons/api_logo_pwrdBy_strava_horiz_orange.svg`;
   const accessToken = request.cookies.get("strava_access_token")?.value;
   if (!accessToken) {
     return NextResponse.json(
@@ -126,6 +127,7 @@ export async function GET(request: NextRequest) {
     cursor.setDate(cursor.getDate() + 1);
   }
 
+  const athleteImageUrl = athlete.profile_medium ?? athlete.profile ?? null;
   const fullName =
     `${athlete.firstname ?? ""} ${athlete.lastname ?? ""}`.trim() ||
     "Strava Athlete";
@@ -137,7 +139,7 @@ export async function GET(request: NextRequest) {
   const rangeLabel = daysToRender === 363 ? "Last year" : "Last 6 months";
   const columnCount = Math.ceil(calendarData.length / 7);
 
-  const levelColors = ["#ffffff", "#fc7100", "#fc6900", "#fc5c00", "#ffd900"];
+  const levelColors = ["#f97316", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
 
   return new ImageResponse(
     (
@@ -146,8 +148,9 @@ export async function GET(request: NextRequest) {
           width: "1200px",
           height: "630px",
           display: "flex",
-          padding: "",
           background: "#f97316",
+          borderRadius: "28px",
+          overflow: "hidden",
           color: "white",
           fontFamily: "Inter, Arial, sans-serif",
           boxSizing: "border-box",
@@ -167,28 +170,21 @@ export async function GET(request: NextRequest) {
             boxSizing: "border-box",
           }}
         >
+
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {athleteImageUrl && (
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <img src={athleteImageUrl} alt="Athlete" style={{ width: "128px", height: "128px", borderRadius: "50%" }} />
+              </div>
+            )}
             <div style={{ display: "flex", fontSize: "64px", fontWeight: 1000, letterSpacing: "-0.05em" }}>
               {fullName}
             </div>
-            <div
-              style={{
-                marginLeft: "auto",
-                display: "flex",
-                background: "white",
-                color: "#FC5200",
-                borderRadius: "10px",
-                padding: "8px 12px",
-                fontSize: "32px",
-                fontWeight: 700,
-              }}
-            >
-              Powered by Strava
-            </div>
+
 
           </div>
 
-          <div
+          {/* <div
             style={{
               display: "flex",
               marginTop: "8px",
@@ -198,7 +194,7 @@ export async function GET(request: NextRequest) {
           >
             {rangeLabel} - {totalActivities} activities - {activeDays} active days
             {location ? ` - ${location}` : ""}
-          </div>
+          </div> */}
 
           <div
             style={{
@@ -238,15 +234,34 @@ export async function GET(request: NextRequest) {
 
           <div
             style={{
+              marginRight: "auto",
               display: "flex",
-              marginTop: "auto",
+              alignItems: "center",
+              background: "white",
+              color: "#FC5200",
+              borderRadius: "12px",
+              padding: "8px 12px",
+            }}
+          >
+            <img
+              src={poweredByStravaLogoUrl}
+              alt="Powered by Strava"
+              // width={240}
+              height={40}
+            />
+          </div>
+
+          {/* <div
+            style={{
+              display: "flex",
+              // marginTop: "auto",
               justifyContent: "center",
               fontSize: "16px",
               color: "rgba(255,255,255,0.8)",
             }}
           >
             Displaying activities from the last {calendarData.length} days
-          </div>
+          </div> */}
         </div>
       </div>
     ),

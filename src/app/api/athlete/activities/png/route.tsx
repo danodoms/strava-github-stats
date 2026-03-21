@@ -43,11 +43,13 @@ function getDaysToRender(request: NextRequest): 181 | 363 {
 
 export async function GET(request: NextRequest) {
   const poweredByStravaLogoUrl = `${request.nextUrl.origin}/icons/api_logo_pwrdBy_strava_horiz_orange.svg`;
-  const accessToken = request.cookies.get("strava_access_token")?.value;
+  const accessToken =
+    request.cookies.get("strava_access_token")?.value ??
+    process.env.STRAVA_ACCESS_TOKEN;
   if (!accessToken) {
     return NextResponse.json(
       { error: "missing_strava_access_token" },
-      { status: 401 },
+      { status: 500 },
     );
   }
 
@@ -131,12 +133,6 @@ export async function GET(request: NextRequest) {
   const fullName =
     `${athlete.firstname ?? ""} ${athlete.lastname ?? ""}`.trim() ||
     "Strava Athlete";
-  const location = [athlete.city, athlete.state, athlete.country]
-    .filter(Boolean)
-    .join(", ");
-  const totalActivities = calendarData.reduce((sum, day) => sum + day.count, 0);
-  const activeDays = calendarData.filter((day) => day.count > 0).length;
-  const rangeLabel = daysToRender === 363 ? "Last year" : "Last 6 months";
   const columnCount = Math.ceil(calendarData.length / 7);
 
   const levelColors = ["#f97316", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
@@ -149,8 +145,7 @@ export async function GET(request: NextRequest) {
           height: "630px",
           display: "flex",
           background: "#f97316",
-          borderRadius: "28px",
-          overflow: "hidden",
+          padding: "12px",
           color: "white",
           fontFamily: "Inter, Arial, sans-serif",
           boxSizing: "border-box",
@@ -163,14 +158,13 @@ export async function GET(request: NextRequest) {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            // border: "1px solid #fdba74",
-            // borderRadius: "18px",
+            borderRadius: "24px",
+            overflow: "hidden",
             background: "#f97316",
             padding: "20px",
             boxSizing: "border-box",
           }}
         >
-
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {athleteImageUrl && (
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -180,21 +174,7 @@ export async function GET(request: NextRequest) {
             <div style={{ display: "flex", fontSize: "64px", fontWeight: 1000, letterSpacing: "-0.05em" }}>
               {fullName}
             </div>
-
-
           </div>
-
-          {/* <div
-            style={{
-              display: "flex",
-              marginTop: "8px",
-              fontSize: "20px",
-              color: "#ffedd5",
-            }}
-          >
-            {rangeLabel} - {totalActivities} activities - {activeDays} active days
-            {location ? ` - ${location}` : ""}
-          </div> */}
 
           <div
             style={{
@@ -246,31 +226,17 @@ export async function GET(request: NextRequest) {
             <img
               src={poweredByStravaLogoUrl}
               alt="Powered by Strava"
-              // width={240}
               height={40}
             />
           </div>
-
-          {/* <div
-            style={{
-              display: "flex",
-              // marginTop: "auto",
-              justifyContent: "center",
-              fontSize: "16px",
-              color: "rgba(255,255,255,0.8)",
-            }}
-          >
-            Displaying activities from the last {calendarData.length} days
-          </div> */}
         </div>
       </div>
     ),
     {
       width: 1200,
       height: 630,
-      // borderRadius: "12px",
       headers: {
-        "Cache-Control": "private, max-age=300",
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
       },
     },
   );

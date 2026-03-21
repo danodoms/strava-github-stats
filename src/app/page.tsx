@@ -80,7 +80,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </p>
           </div>
           <Link
-            href="/athlete/activites"
+            href="/athlete/activities"
             className="mt-5 text-sm font-semibold text-[#FC5200] transition hover:text-[#ff8a4d]"
           >
             View activity calendar

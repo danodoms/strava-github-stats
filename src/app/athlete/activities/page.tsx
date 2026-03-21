@@ -40,7 +40,7 @@ function formatDateOnly(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-export default function AthleteActivitesPage() {
+export default function AthleteActivitiesPage() {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [athlete, setAthlete] = useState<StravaAthlete | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +54,7 @@ export default function AthleteActivitesPage() {
       try {
         setLoading(true);
         const [activitiesRes, athleteRes] = await Promise.all([
-          fetch("/api/athlete/activites?per_page=200&page=1"),
+          fetch("/api/athlete/activities?per_page=200&page=1"),
           fetch("/api/athlete"),
         ]);
         const activitiesBody = (await activitiesRes.json()) as unknown;
@@ -146,7 +146,7 @@ export default function AthleteActivitesPage() {
               Athlete Activities
             </h1>
             <p className="mt-2 text-sm text-white/60">
-              Visualized from cached data at <code>/api/athlete/activites</code>
+              Visualized from cached data at <code>/api/athlete/activities</code>
             </p>
           </div>
           <Link
@@ -191,4 +191,3 @@ export default function AthleteActivitesPage() {
     </main>
   );
 }
-

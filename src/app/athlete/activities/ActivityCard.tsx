@@ -24,12 +24,6 @@ type ActivityCardProps = {
 };
 
 export function ActivityCard({ athlete, calendarData }: ActivityCardProps) {
-  const totalActivities = calendarData.reduce((sum, day) => sum + day.count, 0);
-  const activeDays = calendarData.filter((day) => day.count > 0).length;
-  const location = [athlete?.city, athlete?.state, athlete?.country]
-    .filter(Boolean)
-    .join(", ");
-
   return (
     <div className="flex flex-col max-w-fit gap-4 grow-0 rounded-2xl border-orange-300 border bg-orange-500  p-4">
       <div className="">
@@ -89,7 +83,6 @@ export function ActivityCard({ athlete, calendarData }: ActivityCardProps) {
               "#fc5c00",
               "#FC5200",
             ],
-            // light: ["#1a2238", "#7a2f08", "#b94709", "#e95d0b", "#FC5200"],
           }}
         />
 
@@ -97,20 +90,6 @@ export function ActivityCard({ athlete, calendarData }: ActivityCardProps) {
         <p className="text-sm text-white/60">No activities found.</p>
       )}
       <div className="flex flex-wrap items-center  gap-3">
-        {/* <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-white/80">
-            {totalActivities} activities
-          </span>
-          <span className="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-white/80">
-            {activeDays} active days
-          </span>
-          {location ? (
-            <span className="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-white/80">
-              {location}
-            </span>
-          ) : null}
-        </div> */}
-
         <p className="text-xs text-white/80 font-light w-full text-center">
           Displaying activities from the last {calendarData.length} days
         </p>

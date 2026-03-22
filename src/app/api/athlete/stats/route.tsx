@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
-import { getStravaAccessToken } from "../../_lib/strava-token-store";
+import { getStravaAccessToken } from "@/lib/strava-session";
 
 type StravaActivity = {
   start_date: string;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getStravaAccessToken } from "@/app/api/_lib/strava-token-store";
+import { hasStravaOAuthSession } from "@/lib/strava-session";
 
 type HomeProps = {
   searchParams: Promise<{ connected?: string; error?: string }>;
@@ -7,7 +7,7 @@ type HomeProps = {
 
 export default async function Home({ searchParams }: HomeProps) {
   const sp = await searchParams;
-  const connected = !!(await getStravaAccessToken());
+  const connected = await hasStravaOAuthSession();
 
   const errorMessage = sp.error
     ? "Could not connect to Strava. Try again."
@@ -28,7 +28,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-5xl">
           Strava GitHub Stats
         </h1>
-        <p className="mt-4 max-w-sm text-sm leading-relaxed text-neutral-400 sm:text-base">
+        <p className="max-w-sm text-sm leading-relaxed text-neutral-400 sm:text-base">
           Your runs and rides as a contribution-style calendar.
         </p>
 
@@ -49,24 +49,7 @@ export default async function Home({ searchParams }: HomeProps) {
           )}
         </div>
 
-        <a
-          href="https://www.strava.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-14 flex items-center gap-2"
-          aria-label="Powered by Strava"
-        >
-          <img
-            src="/icons/api_logo_pwrdBy_strava_horiz_orange.svg"
-            alt="Powered by Strava"
-            className="h-8"
-            style={{
-              display: "block",
-              maxWidth: "100%",
-              height: "2rem",
-            }}
-          />
-        </a>
+
       </div>
     </div>
   );

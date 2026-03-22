@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStravaAccessToken } from "../_lib/strava-token-store";
+import { getStravaAccessToken } from "@/lib/strava-session";
 
 const CACHE_TTL_MS = 15 * 60 * 1000;
 

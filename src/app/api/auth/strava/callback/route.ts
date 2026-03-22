@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { setStravaTokensFromOAuth } from "../../../_lib/strava-token-store";
+import { setStravaAuthCookies } from "@/lib/strava-session";
 
 function redirectUri(request: NextRequest): string {
   return (
@@ -54,10 +54,11 @@ export async function GET(request: NextRequest) {
     scope?: string;
   };
 
-  const stored = setStravaTokensFromOAuth(data);
+  const response = NextResponse.redirect(`${origin}/?connected=1`);
+  const stored = setStravaAuthCookies(response, data);
   if (!stored) {
     return NextResponse.redirect(`${origin}/?error=token_store_failed`);
   }
 
-  return NextResponse.redirect(`${origin}/?connected=1`);
+  return response;
 }
